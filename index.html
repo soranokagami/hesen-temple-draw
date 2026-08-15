@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合森福德正神 數位籤筒</title>
+    <style>
+        :root {
+            --bg-color: #f7f4ee;
+            --card-bg: #fffdf9;
+            --ink-black: #2b2b2b;
+            --cinnabar-red: #9e2a2b;
+            --border-color: #d1c7b7;
+        }
+		/* 宣告內文字體 */
+		@font-face {
+			font-family: 'MyBodyFont';
+			src: url('BodyFont.ttf') format('truetype'); 
+		}
+
+		/* 宣告標題字體 */
+		@font-face {
+			font-family: 'MyTitleFont';
+			src: url('TitleFont.ttf') format('truetype'); 
+		}
+		
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            /* 把 MyBodyFont 放第一個，如果使用者的裝置讀不到，才會往後找備用字體 */
+			font-family: 'MyBodyFont', "Noto Serif TC", "Songti TC", serif;
+			-webkit-tap-highlight-color: transparent;
+        }
+		
+		/* 👇 新增這一個區塊，把所有「標題類」的元件指定為標題字體 */
+		.title, 
+		.temple-title, 
+		.draw-result-number, 
+		#detail-id {
+			font-family: 'MyTitleFont', "Noto Serif TC", "Songti TC", serif;
+		}
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--ink-black);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .container {
+			width: 100%;
+			max-width: 480px;
+			min-height: 580px;
+			
+			/* 👇 主要改這裡：把單色背景換成你的和紙圖片 */
+			background-image: url('bg.jpg');
+			background-size: cover; 
+			background-position: center;
+			/* 為了避免和紙紋理太深影響閱讀，可以疊一層極淡的半透明白色作為緩衝（可選） */
+			background-color: rgba(255, 253, 249, 0.6); 
+			background-blend-mode: overlay; /* 讓顏色跟和紙紋理融合 */
+
+			border: 2px solid var(--border-color);
+			border-radius: 8px;
+			box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+			padding: 28px 20px;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			text-align: center;
+			position: relative;
+		}
+
+        /* 開場畫面 */
+        #view-intro {
+            transition: opacity 1.0s ease;
+        }
+        .temple-title {
+            font-size: 28px;
+            color: var(--cinnabar-red);
+            margin-bottom: 8px;
+            letter-spacing: 4px;
+            font-weight: bold;
+        }
+        .temple-sub {
+            font-size: 16px;
+            color: #666;
+            letter-spacing: 2px;
+        }
+
+        /* 標題與說明 */
+        .title {
+            font-size: 24px;
+            color: var(--cinnabar-red);
+            margin-bottom: 12px;
+            letter-spacing: 2px;
+        }
+        .instruction {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 28px;
+            padding: 12px;
+            background: rgba(158, 42, 43, 0.04);
+            border-left: 3px solid var(--cinnabar-red);
+            border-radius: 4px;
+            text-align: left;
+        }
+
+        .btn-group {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* =======================================
+           按鈕樣式一：普通文字按鈕 (給返回、再抽一次使用) 
+           ======================================= */
+        .btn {
+            width: 100%;
+            padding: 16px;
+            font-size: 18px;
+            letter-spacing: 2px;
+            background-color: transparent;
+            color: var(--ink-black); /* 恢復文字顏色 */
+            border: 1.5px solid var(--ink-black); /* 恢復邊框 */
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .btn:active {
+            background-color: var(--cinnabar-red);
+            color: #ffffff;
+            border-color: var(--cinnabar-red);
+            transform: scale(0.95);
+        }
+        .btn-sub {
+            border-color: #888;
+            color: #666;
+        }
+
+        /* =======================================
+           按鈕樣式二：專屬圖片按鈕 (給首頁自己畫的圖使用) 
+           ======================================= */
+        .btn-img {
+            height: 70px; /* 依照你畫的圖片比例稍微調整 */
+            padding: 0;
+            border: none;
+            background-color: transparent;
+            color: transparent !important; /* 隱藏原本文字 */
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        .btn-img:active {
+            background-color: transparent; /* 取消下壓底色，因為圖本身有畫朱紅印章了 */
+            border: none;
+        }
+
+        /* 首頁的求籤與查籤圖片替換 */
+        .btn-draw { background-image: url('btn-draw-normal.png'); }
+        .btn-draw:active { background-image: url('btn-draw-active.png'); }
+
+        .btn-search { background-image: url('btn-search-normal.png'); }
+        .btn-search:active { background-image: url('btn-search-active.png'); }
+		
+		/* 👇 新增這兩組：再抽一次 ＆ 回首頁 */
+        .btn-draw-again { background-image: url('btn-again-normal.png'); }
+        .btn-draw-again:active { background-image: url('btn-again-active.png'); }
+
+        .btn-home { background-image: url('btn-home-normal.png'); }
+        .btn-home:active { background-image: url('btn-home-active.png'); }
+
+		.btn-view { background-image: url('btn-view-normal.png'); }
+        .btn-view:active { background-image: url('btn-view-active.png'); }
+		
+        /* 籤筒定格動畫區塊 */
+        .shaking-box {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+        }
+        .cylinder-anim {
+            width: 120px;
+            height: 160px; /* 如果圖片比較長，這個高度可以適度調大 */
+            background-image: url('cylinder.png');
+            background-size: contain;
+            background-position: center bottom;
+            background-repeat: no-repeat;
+            
+            /* 讓搖晃的支點在「底部正中央」 */
+            transform-origin: center bottom;
+        }
+        /* 加上 .active 才會開始搖晃與切換圖片 */
+        .cylinder-anim.active {
+            animation: stop-motion-shake 0.8s step-end infinite;
+        }
+        /* 定格動畫：轉到對應角度時，直接換圖 */
+        @keyframes stop-motion-shake {
+            0%   { transform: rotate(0deg);   background-image: url('cylinder.png'); }
+            25%  { transform: rotate(30deg);  background-image: url('cylinder-ver2.png'); }
+            50%  { transform: rotate(0deg);   background-image: url('cylinder.png'); }
+            75%  { transform: rotate(-30deg); background-image: url('cylinder-ver2.png'); }
+            100% { transform: rotate(0deg);   background-image: url('cylinder.png'); }
+        }
+
+        /* 籤號大字展示 */
+        .draw-result-number {
+            font-size: 38px;
+            color: var(--cinnabar-red);
+            font-weight: bold;
+            letter-spacing: 4px;
+            margin: 16px 0;
+        }
+
+        /* 籤詩內文展示 */
+        .poem-box {
+            margin: 18px 0;
+            padding: 16px;
+            border: 1px dashed var(--cinnabar-red);
+            background: rgba(158, 42, 43, 0.02);
+            border-radius: 6px;
+        }
+        .poem-text {
+            font-size: 20px;
+            line-height: 2;
+            letter-spacing: 3px;
+            white-space: pre-line;
+            color: var(--ink-black);
+            font-weight: 500;
+        }
+        .desc-text {
+            margin-top: 14px;
+            font-size: 15px;
+            line-height: 1.7;
+            color: #444;
+            text-align: justify;
+        }
+
+        /* 搜尋輸入框與清單 */
+        .search-input {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: #fff;
+            margin-bottom: 16px;
+            outline: none;
+        }
+        .search-input:focus {
+            border-color: var(--cinnabar-red);
+        }
+        .search-list {
+            width: 100%;
+            max-height: 320px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            text-align: left;
+        }
+        .search-item {
+            padding: 12px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fff;
+        }
+        .search-item:hover {
+            border-color: var(--cinnabar-red);
+            background: rgba(158, 42, 43, 0.03);
+        }
+        .search-item-id {
+            color: var(--cinnabar-red);
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .search-item-snippet {
+            font-size: 13px;
+            color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- 0. 開場畫面 -->
+    <div id="view-intro">
+        <div style="font-size: 56px; margin-bottom: 16px;">
+            <img src="temple.jpg" alt="廟宇" style="width: 80%; max-width: 300px; border-radius: 8px;">
+        </div>
+        <div class="temple-title">合森福德正神</div>
+        <div class="temple-sub">數位籤筒</div>
+    </div>
+
+    <!-- 1. 首頁選單 -->
+    <div id="view-home" style="display: none; width: 100%;">
+        <div class="title">雷雨師靈籤</div>
+        <div class="instruction">
+            請先向土地公稟明姓名、生辰、住址與所求之事。<br>
+            實體擲筊得<strong>一聖杯</strong>允諾後，再行求籤。
+        </div>
+        <div class="btn-group">
+            <!-- 這裡加上 btn-img 讓它套用你的圖片設定 -->
+            <button class="btn btn-img btn-draw" onclick="startDraw()">求 籤</button>
+            <button class="btn btn-img btn-search" onclick="openSearch()">查看籤詩</button>
+        </div>
+    </div>
+
+    <!-- 2. 抽籤動畫中 -->
+    <div id="view-drawing" style="display: none; width: 100%;">
+        <div class="shaking-box">
+            <!-- 👇 改成用 div 來裝載動畫，不再使用原本的 img -->
+            <div id="cylinder-anim" class="cylinder-anim"></div>
+        </div>
+        <div class="title">誠心搖籤中…</div>
+        <p style="color: #666; font-size: 14px;">請耐心等待神明指引</p>
+    </div>
+
+    <!-- 3. 抽籤結果 (待擲筊確認) -->
+    <div id="view-result" style="display: none; width: 100%;">
+        <div style="font-size: 15px; color: #666;">您抽得的籤號為</div>
+        <div id="result-num-display" class="draw-result-number">第 一 籤</div>
+        <div class="instruction">
+            請向土地公實體擲筊，連續獲得<strong>三次聖杯</strong>確認此籤。<br>
+            若未得三聖杯，請點選「再抽一次」。
+        </div>
+        <div class="btn-group">
+            <!-- 這裡恢復成普通的文字按鈕，字就不會隱形了 -->
+            <button class="btn btn-img btn-view" onclick="confirmCurrentPoem()">查看籤詩</button>
+            <button class="btn btn-img btn-draw-again" onclick="startDraw()">再抽一次</button>
+        </div>
+    </div>
+
+	<!-- 4. 籤詩詳情頁 -->
+    <div id="view-detail" style="display: none; width: 100%;">
+        <div id="detail-id" class="title" style="margin-bottom: 4px;">第 一 籤</div>
+        <div class="poem-box">
+            <div id="detail-poem" class="poem-text"></div>
+        </div>
+        <div id="detail-desc" class="desc-text"></div>
+        <div class="btn-group" style="margin-top: 24px;">
+            <!-- 👇 加上 btn-img 與 btn-home，並把文字統一改成返回 -->
+            <button class="btn btn-img btn-home" onclick="goHome()">返回</button>
+        </div>
+    </div>
+
+    <!-- 5. 搜尋 / 查籤頁 -->
+    <div id="view-search" style="display: none; width: 100%;">
+        <div class="title">查詢籤詩</div>
+        <input type="text" id="search-input" class="search-input" placeholder="輸入籤號 (如: 15) 或 詩句關鍵字" oninput="handleSearch()">
+        <div id="search-results" class="search-list"></div>
+        <div class="btn-group" style="margin-top: 16px;">
+            <!-- 👇 一樣加上 btn-img 與 btn-home -->
+            <button class="btn btn-img btn-home" onclick="goHome()">返回</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- 籤詩資料庫 (已包含頭籤至 100 籤) -->
+<script src="fortunes.js"></script>
+
+<script>
+    let currentDrawnId = null;
+
+    // 開場自動淡出切換
+    window.onload = () => {
+        setTimeout(() => {
+            const intro = document.getElementById('view-intro');
+            intro.style.opacity = '0';
+            setTimeout(() => {
+                intro.style.display = 'none';
+                document.getElementById('view-home').style.display = 'block';
+            }, 800);
+        }, 1200);
+    };
+
+    function showView(viewId) {
+        const views = ['view-intro', 'view-home', 'view-drawing', 'view-result', 'view-detail', 'view-search'];
+        views.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = (id === viewId) ? 'block' : 'none';
+        });
+    }
+
+    function goHome() {
+        showView('view-home');
+    }
+
+    // 開始抽籤
+    function startDraw() {
+        showView('view-drawing');
+        
+        // 抓取籤筒，並加上 active 讓它開始跑定格動畫
+        const cylinderAnim = document.getElementById('cylinder-anim');
+        cylinderAnim.classList.add('active');
+
+        // 等待 5 秒鐘的期待感
+        setTimeout(() => {
+            // 時間到！移除 active 讓籤筒立正站好，並變回原圖
+            cylinderAnim.classList.remove('active');
+
+            const randomIndex = Math.floor(Math.random() * fortunesData.length);
+            const drawn = fortunesData[randomIndex];
+            currentDrawnId = drawn.id;
+
+            const displayTitle = drawn.id === '頭籤' ? '頭 籤' : `第 ${drawn.id} 籤`;
+            document.getElementById('result-num-display').innerText = displayTitle;
+            showView('view-result');
+        }, 5000); // 👈 搖晃時間改為 5000 毫秒 (5秒)
+    }
+
+    // 確認看抽到的籤
+    function confirmCurrentPoem() {
+        showPoemDetail(currentDrawnId);
+    }
+
+    // 顯示籤詩內容
+    function showPoemDetail(id) {
+        const item = fortunesData.find(f => f.id.toString() === id.toString());
+        if (!item) return;
+
+        document.getElementById('detail-id').innerText = item.id === '頭籤' ? '頭 籤' : `第 ${item.id} 籤`;
+        document.getElementById('detail-poem').innerText = item.poem;
+        document.getElementById('detail-desc').innerText = item.desc;
+        showView('view-detail');
+    }
+
+    // 搜尋功能
+    function openSearch() {
+        showView('view-search');
+        document.getElementById('search-input').value = '';
+        renderSearchResults(fortunesData);
+    }
+
+    function handleSearch() {
+        const query = document.getElementById('search-input').value.trim();
+        if (!query) {
+            renderSearchResults(fortunesData);
+            return;
+        }
+        const filtered = fortunesData.filter(item => 
+            item.id.toString() === query ||
+            item.poem.includes(query) ||
+            item.desc.includes(query)
+        );
+        renderSearchResults(filtered);
+    }
+
+    function renderSearchResults(list) {
+        const container = document.getElementById('search-results');
+        if (list.length === 0) {
+            container.innerHTML = '<div style="color:#888; text-align:center; padding: 20px;">查無相符籤詩</div>';
+            return;
+        }
+        container.innerHTML = list.map(item => {
+            const title = item.id === '頭籤' ? '頭 籤' : `第 ${item.id} 籤`;
+            const firstLine = item.poem.split('\n')[0];
+            return `
+                <div class="search-item" onclick="showPoemDetail('${item.id}')">
+                    <div class="search-item-id">${title}</div>
+                    <div class="search-item-snippet">${firstLine}…</div>
+                </div>
+            `;
+        }).join('');
+    }
+</script>
+</body>
+</html>
