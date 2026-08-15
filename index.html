@@ -16,12 +16,14 @@
 		@font-face {
 			font-family: 'MyBodyFont';
 			src: url('BodyFont.woff2') format('truetype'); 
+			font-display: swap; /* 👈 新增這行：載入慢時先用預設字體墊檔 */
 		}
 
 		/* 宣告標題字體 */
 		@font-face {
 			font-family: 'MyTitleFont';
 			src: url('TitleFont.woff2') format('truetype'); 
+			font-display: swap; /* 👈 新增這行：載入慢時先用預設字體墊檔 */
 		}
 		
         * {
@@ -377,7 +379,7 @@
     let currentDrawnId = null;
 
     // 開場自動淡出切換
-    window.onload = () => {
+    document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => {
             const intro = document.getElementById('view-intro');
             intro.style.opacity = '0';
@@ -386,7 +388,7 @@
                 document.getElementById('view-home').style.display = 'block';
             }, 800);
         }, 1200);
-    };
+    });
 
     function showView(viewId) {
         const views = ['view-intro', 'view-home', 'view-drawing', 'view-result', 'view-detail', 'view-search'];
