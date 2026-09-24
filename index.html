@@ -165,22 +165,14 @@
             border: none;
         }
 
-        /* 首頁的求籤與查籤圖片替換 */
+       /* 專屬圖片按鈕設定 */
         .btn-draw { background-image: url('btn-draw-normal.png'); }
-        .btn-draw:active { background-image: url('btn-draw-active.png'); }
-
         .btn-search { background-image: url('btn-search-normal.png'); }
-        .btn-search:active { background-image: url('btn-search-active.png'); }
 		
-		/* 👇 新增這兩組：再抽一次 ＆ 回首頁 */
+        /* 再抽一次 ＆ 回首頁 ＆ 查看籤詩 */
         .btn-draw-again { background-image: url('btn-again-normal.png'); }
-        .btn-draw-again:active { background-image: url('btn-again-active.png'); }
-
         .btn-home { background-image: url('btn-home-normal.png'); }
-        .btn-home:active { background-image: url('btn-home-active.png'); }
-
-		.btn-view { background-image: url('btn-view-normal.png'); }
-        .btn-view:active { background-image: url('btn-view-active.png'); }
+        .btn-view { background-image: url('btn-view-normal.png'); }
 		
         /* 籤筒定格動畫區塊 */
         .shaking-box {
@@ -357,6 +349,10 @@
             <!-- 👇 加上 btn-img 與 btn-home，並把文字統一改成返回 -->
             <button class="btn btn-img btn-home" onclick="goHome()">返回</button>
         </div>
+		<!-- 👇 新增這段警語/提醒，它會顯示在返回圖片的正下方 -->
+        <div style="margin-top: 16px; font-size: 14px; color: #7d1616; letter-spacing: 1.5px; text-align: center;">
+            籤詩僅供指引，事在人為，心存善念自能趨吉避凶。
+		</div>
     </div>
 
     <!-- 5. 搜尋 / 查籤頁 -->
@@ -368,9 +364,7 @@
             <!-- 👇 一樣加上 btn-img 與 btn-home -->
             <button class="btn btn-img btn-home" onclick="goHome()">返回</button>
         </div>
-    </div>
-
-</div>
+	</div>
 
 <!-- 籤詩資料庫 (已包含頭籤至 100 籤) -->
 <script src="fortunes.js"></script>
