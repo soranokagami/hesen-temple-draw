@@ -66,9 +66,10 @@
 			background-color: rgba(255, 253, 249, 0.6); 
 			background-blend-mode: overlay; /* 讓顏色跟和紙紋理融合 */
 
-			border: 2px solid var(--border-color);
-			border-radius: 8px;
-			box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+			border: none; /* 把原本的邊框線條拿掉，讓紙張邊緣更自然 */
+			border-radius: 0px; /* 拿掉圓角，恢復傳統紙張的直角 */
+			/* 👇 第一層陰影深且緊貼邊緣(模擬厚度)，第二層陰影範圍小且稍微往下(模擬微小落影) */
+			box-shadow: 0 0 2px rgba(0, 0, 0, 0.3), 0 5px 12px rgba(0, 0, 0, 0.1);
 			padding: 28px 20px;
 			display: flex;
 			flex-direction: column;
@@ -350,8 +351,8 @@
             <button class="btn btn-img btn-home" onclick="goHome()">返回</button>
         </div>
 		<!-- 👇 新增這段警語/提醒，它會顯示在返回圖片的正下方 -->
-        <div style="margin-top: 16px; font-size: 14px; color: #7d1616; letter-spacing: 1.5px; text-align: center;">
-            籤詩僅供指引，事在人為，心存善念自能趨吉避凶。
+        <div style="margin-top: 16px; font-size: 14px; color: #7d1616; letter-spacing: 1.5px; text-align: center; line-height: 1.6;">
+			籤詩旨在提點，事在人為，<br>心存善念自能趨吉避凶。
 		</div>
     </div>
 
